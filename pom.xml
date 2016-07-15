@@ -95,7 +95,7 @@
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-log4j12</artifactId>
-			<version>1.5.8</version>
+			<version>1.6.2</version>
 			<optional>true</optional>
 		</dependency>
 		<dependency>
@@ -114,17 +114,40 @@
 			<artifactId>mysql-connector-java</artifactId>
 			<version>5.1.3</version>
 		</dependency>
+		<!--spring batch admin -->
 		<dependency>
 			<groupId>org.aspectj</groupId>
 			<artifactId>aspectjrt</artifactId>
-			<version>1.5.4</version>
+			<version>1.6.6</version>
 		</dependency>
 		<dependency>
 			<groupId>org.aspectj</groupId>
 			<artifactId>aspectjweaver</artifactId>
-			<version>1.5.4</version>
+			<version>1.6.6</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.batch</groupId>
+			<artifactId>spring-batch-admin-manager</artifactId>
+			<version>1.2.0.RELEASE</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>jcl-over-slf4j</artifactId>
+					<groupId>org.slf4j</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.batch</groupId>
+			<artifactId>spring-batch-admin-resources</artifactId>
+			<version>1.2.0.RELEASE</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.batch</groupId>
+			<artifactId>spring-batch-integration</artifactId>
+			<version>1.2.0.RELEASE</version>
 		</dependency>
 	</dependencies>
+
 	<build>
 		<extensions>
 			<extension>
@@ -151,8 +174,8 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
-					<source>1.5</source>
-					<target>1.5</target>
+					<source>1.6</source>
+					<target>1.6</target>
 				</configuration>
 			</plugin>
 			<plugin>

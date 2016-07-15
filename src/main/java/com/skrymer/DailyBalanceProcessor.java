@@ -42,6 +42,7 @@ public class DailyBalanceProcessor implements ItemProcessor<Owner, Owner> {
       BigDecimal acquiredStocks = BigDecimal.valueOf(acquisition.getAcquired());
       dailyBalance = dailyBalance.add(acquiredStocks.multiply(stockPrice));
     }
+
     return dailyBalance.toPlainString();
   }
 

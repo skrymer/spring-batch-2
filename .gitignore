@@ -7,3 +7,5 @@ release.properties
 dependency-reduced-pom.xml
 buildNumber.properties
 .mvn/timing.properties
+/stock-batch-example.iml
+/.idea/

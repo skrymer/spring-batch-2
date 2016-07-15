@@ -7,38 +7,52 @@
                     http://www.springframework.org/schema/batch
                     http://www.springframework.org/schema/batch/spring-batch-2.1.xsd">
 
-    <import resource="../launch-context.xml"/>
+    <import resource="classpath*:/META-INF/spring/batch/override/launch-context.xml"/>
 
-    <!--Listeners-->
-    <!--<bean id="jobLoggerListener" class="com.fostermoore.spring.batch.example.JobLoggerListener"/>-->
-    <!--<bean id="stepStartStopListener" class="com.fostermoore.spring.batch.example.LoggingStepStartStopListener"/>-->
+    <bean id="myTaskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+        <property name="corePoolSize" value="10"/>
+        <property name="maxPoolSize" value="15"/>
+    </bean>
 
-    <bean id="taskExecutor" class="org.springframework.core.task.SimpleAsyncTaskExecutor"/>
+    <bean id="mySkipListener" class="com.skrymer.listener.MySkipListener"/>
 
+    <bean id="myJobListener" class="com.skrymer.listener.MyJobListener">
+        <constructor-arg ref="myTaskExecutor"/>
+    </bean>
+
+    <!-- Adds run.id parameter to the job execution-->
     <bean id="idIncrementer" class="org.springframework.batch.core.launch.support.RunIdIncrementer"/>
 
     <batch:job id="stockJob" incrementer="idIncrementer">
         <batch:step id="importStockData" next="calculateDailyBalance">
-            <!--Beware of thread/connection pool starvation! - set throttle-limit to no more that the pool count -->
-            <batch:tasklet task-executor="taskExecutor" throttle-limit="10">
+            <!--Beware of thread/connection pool starvation! - set throttle-limit to no more than the max pool size -->
+            <!--This step is executed asynchronously using 5 thread-->
+            <batch:tasklet task-executor="myTaskExecutor" throttle-limit="5" transaction-manager="transactionManager">
                 <batch:chunk reader="stockFileReader" processor="stockProcessor" writer="stockItemWriter" commit-interval="1"/>
             </batch:tasklet>
         </batch:step>
 
-        <!--Step update users daily dailyBalance-->
-
         <batch:step id="calculateDailyBalance" next="cleanup">
-            <batch:tasklet>
-                <batch:chunk commit-interval="1" reader="ownerReader" processor="dailyBalanceProcessor" writer="dailyBalanceWriter"/>
+            <batch:tasklet transaction-manager="transactionManager">
+                <batch:chunk commit-interval="1" reader="ownerReader" processor="dailyBalanceProcessor" writer="dailyBalanceWriter" skip-limit="10">
+                    <batch:listeners>
+                        <batch:listener ref="mySkipListener"/>
+                    </batch:listeners>
+                    <!--Skip on certain exceptions-->
+                    <batch:skippable-exception-classes>
+                        <batch:include class="com.skrymer.DailyBalanceException"/>
+                    </batch:skippable-exception-classes>
+                </batch:chunk>
             </batch:tasklet>
         </batch:step>
 
         <batch:step id="cleanup">
-            <batch:tasklet ref="cleanupTasklet"/>
+            <batch:tasklet ref="cleanupTasklet" transaction-manager="transactionManager"/>
         </batch:step>
-        <!--We wanna show case async chunks and steps-->
 
-        <!--Add step that create a 'report' based on a users stock allocations-->
+        <batch:listeners>
+            <batch:listener ref="myJobListener"/>
+        </batch:listeners>
     </batch:job>
 
     <bean id="stockFileReader" class="org.springframework.batch.item.file.FlatFileItemReader">
@@ -105,5 +119,11 @@
         </property>
     </bean>
 
-    <bean id="cleanupTasklet" class="com.skrymer.CleanupTasklet"/>
+    <bean id="cleanupTasklet" class="com.skrymer.CleanupTasklet" >
+        <property name="template" ref="template"/>
+    </bean>
+
+    <bean id="template" class="org.springframework.jdbc.core.JdbcTemplate">
+        <constructor-arg index="0" ref="dataSource"/>
+    </bean>
 </beans>

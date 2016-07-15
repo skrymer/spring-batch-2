@@ -15,14 +15,15 @@ import javax.sql.DataSource;
 public class CleanupTasklet implements Tasklet {
   private JdbcTemplate template;
 
-  @Autowired
-  public CleanupTasklet(DataSource dataSource){
-      this.template = new JdbcTemplate(dataSource);
-  }
+  public CleanupTasklet(){}
 
   public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
     template.execute("delete from stock");
 
     return RepeatStatus.FINISHED;
+  }
+
+  public void setTemplate(JdbcTemplate template) {
+    this.template = template;
   }
 }

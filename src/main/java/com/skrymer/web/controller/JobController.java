@@ -1,13 +1,10 @@
 package com.skrymer.web.controller;
 
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobParameter;
-import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.*;
 import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.launch.JobOperator;
-import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -42,18 +39,15 @@ public class JobController {
   @Qualifier("stockJob")
   Job job;
 
-
-
   @RequestMapping("/launch")
   public ResponseEntity<String> handle() throws Exception{
     JobParameter parameter = new JobParameter(System.currentTimeMillis());
     Map<String, JobParameter> parameters = new HashMap<String, JobParameter>();
     parameters.put("time", parameter);
 
-    //Not async? - weird
-    jobLauncher.run(job, new JobParameters(parameters));
+    JobExecution jobExecution = jobLauncher.run(job, new JobParameters(parameters));
 
-    return new ResponseEntity<String>("ok", HttpStatus.OK);
+    return new ResponseEntity<String>("Job started with job instance id: " + jobExecution.getJobId(), HttpStatus.OK);
   }
 
   @RequestMapping("/stop")
@@ -63,8 +57,24 @@ public class JobController {
       jobOperator.stop(executions.iterator().next());
     } catch (Exception e) {
       e.printStackTrace();
-      return new ResponseEntity<String>("ok", HttpStatus.INTERNAL_SERVER_ERROR);
+      return new ResponseEntity<String>("failed", HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+    for(JobInstance jobInstance : jobExplorer.getJobInstances("JobName", 1, 100)) {
+      for (JobExecution jobExecution : jobExplorer.getJobExecutions(jobInstance)) {
+        jobExecution.getEndTime();
+        jobExecution.getStartTime();
+        jobExecution.getExitStatus();
+
+        for (StepExecution stepExecution : jobExecution.getStepExecutions()) {
+          stepExecution.getEndTime();
+          stepExecution.getStartTime();
+          stepExecution.getExitStatus();
+        }
+      }
+    }
+
+
 
     return new ResponseEntity<String>("ok", HttpStatus.OK);
   }
@@ -73,8 +83,7 @@ public class JobController {
   public ResponseEntity<String> restart(){
     try {
       Set<Long> executions = jobOperator.getRunningExecutions(job.getName());
-
-      jobOperator.stop(executions.iterator().next());
+      jobOperator.restart(executions.iterator().next());
     } catch (Exception e) {
       e.printStackTrace();
       return new ResponseEntity<String>("ok", HttpStatus.INTERNAL_SERVER_ERROR);

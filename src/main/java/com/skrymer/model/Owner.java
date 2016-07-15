@@ -1,5 +1,6 @@
 package com.skrymer.model;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.springframework.jdbc.core.RowMapper;
 
 import java.sql.ResultSet;
@@ -49,5 +50,10 @@ public class Owner {
         return owner;
       }
     };
+  }
+
+  @Override
+  public String toString() {
+    return ToStringBuilder.reflectionToString(this);
   }
 }

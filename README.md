@@ -5,7 +5,8 @@
 
 ## How to run
  * mvn clean install
- * java -jar target/stock-batch-example-0.0.1-SNAPSHOT.jar jobs/job.xml stockJob
+ * then mvn jetty:run
+ * then http:localhost:8080/index
 
 ##Yahoo finance stuff
  * stock symbol lookup http://finance.yahoo.com/lookup

@@ -5,8 +5,6 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans 
        	http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
 
-	<!--The job operator can be used when stopping and restarting-->
-
 	<bean id="jobOperator"
 		class="org.springframework.batch.core.launch.support.SimpleJobOperator"
 		p:jobLauncher-ref="jobLauncher" p:jobExplorer-ref="jobExplorer"
@@ -22,15 +20,18 @@
 	<bean class="org.springframework.batch.core.configuration.support.JobRegistryBeanPostProcessor">
 		<property name="jobRegistry" ref="jobRegistry"/>
 	</bean>
-	
+
+	<bean id="jobLauncherAsyncTaskExecutor" class="org.springframework.core.task.SimpleAsyncTaskExecutor"/>
+
 	<bean id="jobLauncher"
 		class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
 		<property name="jobRepository" ref="jobRepository" />
+		<property name="taskExecutor" ref="jobLauncherAsyncTaskExecutor"/>
 	</bean>
 	
 	<bean id="jobRepository"
 		class="org.springframework.batch.core.repository.support.JobRepositoryFactoryBean"
-		p:dataSource-ref="dataSource" p:transactionManager-ref="transactionManager" />
+		p:dataSource-ref="dataSource" p:transactionManager-ref="transactionManager" p:databaseType="MYSQL"/>
 
 	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
 		<property name="driverClassName" value="${batch.jdbc.driver}" />

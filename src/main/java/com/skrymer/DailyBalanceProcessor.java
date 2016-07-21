@@ -25,7 +25,7 @@ public class DailyBalanceProcessor implements ItemProcessor<Owner, Owner> {
 
     owner.setDailyBalance(calculateDailyBalance(acquisitions));
 
-    Thread.sleep(10000);
+    Thread.sleep(1000);
 
     return owner;
   }
@@ -62,10 +62,10 @@ public class DailyBalanceProcessor implements ItemProcessor<Owner, Owner> {
     for(int i = 0; i < acquisitions.size(); i++){
       Acquisition acquisition = acquisitions.get(i);
       if(isLastElement(i, acquisitions)){
-        inClause.append("\"" + acquisition.getStockSymbol() + "\"");
+        inClause.append("'" + acquisition.getStockSymbol() + "'");
       }
       else {
-        inClause.append("\"" + acquisition.getStockSymbol() + "\",");
+        inClause.append("'" + acquisition.getStockSymbol() + "',");
       }
     }
     inClause.append(")");

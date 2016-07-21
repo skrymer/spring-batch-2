@@ -28,7 +28,7 @@
             <!--Beware of thread/connection pool starvation! - set throttle-limit to no more than the max pool size -->
             <!--This step is executed asynchronously using 5 thread-->
             <batch:tasklet task-executor="myTaskExecutor" throttle-limit="5" transaction-manager="transactionManager">
-                <batch:chunk reader="stockFileReader" processor="stockProcessor" writer="stockItemWriter" commit-interval="1"/>
+                <batch:chunk reader="stockSymbolReader" processor="stockProcessor" writer="stockItemWriter" commit-interval="1"/>
             </batch:tasklet>
         </batch:step>
 
@@ -55,7 +55,7 @@
         </batch:listeners>
     </batch:job>
 
-    <bean id="stockFileReader" class="org.springframework.batch.item.file.FlatFileItemReader">
+    <bean id="stockSymbolReader" class="org.springframework.batch.item.file.FlatFileItemReader">
         <property name="recordSeparatorPolicy">
             <bean class="org.springframework.batch.item.file.separator.DefaultRecordSeparatorPolicy"/>
         </property>

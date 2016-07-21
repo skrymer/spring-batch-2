@@ -11,6 +11,10 @@
             classpath*:/org/springframework/batch/admin/web/resources/webapp-config.xml
         </param-value>
     </context-param>
+    <context-param>
+        <param-name>spring.profiles.default</param-name>
+        <param-value>prd</param-value>
+    </context-param>
     <filter>
         <filter-name>hiddenHttpMethodFilter</filter-name>
         <filter-class>

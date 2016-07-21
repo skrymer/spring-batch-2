@@ -34,15 +34,3 @@ ADD CONSTRAINT fk_OwnerName
 FOREIGN KEY (owner_name)
 REFERENCES owner(name);
 
-insert into owner values("sonni", 0);
-insert into acquisition values("MSFT", 10, "sonni");
-insert into acquisition values("YHOO", 100, "sonni");
-insert into acquisition values("AAPL", 5, "sonni");
-insert into owner values("kenneth", 0);
-insert into acquisition values("YHOO", 50, "kenneth");
-insert into owner values("roger", 0);
-insert into acquisition values("AAPL", 200, "roger");
-insert into owner values("scott", 0);
-insert into acquisition values("MSFT", 40, "scott");
-insert into acquisition values("YHOO", 80, "scott");
-
